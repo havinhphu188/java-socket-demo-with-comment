@@ -1,7 +1,7 @@
-package javaapplication1;
+package knockknock;
 
 /*
- * Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1995, 2014, Oracle and/or its affiliates. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,35 +34,38 @@ package javaapplication1;
 import java.net.*;
 import java.io.*;
 
-public class EchoServer {
+public class KnockKnockServer {
     public static void main(String[] args) throws IOException {
         
         if (args.length != 1) {
-            System.err.println("Usage: java EchoServer <port number>");
+            System.err.println("Usage: java KnockKnockServer <port number>");
             System.exit(1);
         }
-        
-        int portNumber = Integer.parseInt(args[0]);
-        
 
-        try (
-            ServerSocket serverSocket =
-                new ServerSocket(Integer.parseInt(args[0]));
-            Socket clientSocket = serverSocket.accept();     
-            PrintWriter out = //out is the client side input stream. echo back to client using this stream
-                new PrintWriter(clientSocket.getOutputStream(), true);                   
-            BufferedReader in = new BufferedReader( // socket stream the client send message
+        int portNumber = Integer.parseInt(args[0]);
+
+        try ( 
+            ServerSocket serverSocket = new ServerSocket(portNumber);
+            Socket clientSocket = serverSocket.accept();
+            PrintWriter out =
+                new PrintWriter(clientSocket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(
                 new InputStreamReader(clientSocket.getInputStream()));
         ) {
-            String inputLine;
-            inputLine = in.readLine();
-//            while ((inputLine = in.readLine()) != null) {
-//               // out.println(inputLine); //echo back
-//                System.out.println("received: "+inputLine);
-//            }
-            out.println("HTTP/1.1 307 Temporary Redirect");
-            out.println("Location: https://www.eff.org/");
-            out.println();
+        
+            String inputLine, outputLine;
+            
+            // Initiate conversation with client
+            KnockKnockProtocol kkp = new KnockKnockProtocol();
+            outputLine = kkp.processInput(null);
+            out.println(outputLine);
+
+            while ((inputLine = in.readLine()) != null) {
+                outputLine = kkp.processInput(inputLine);
+                out.println(outputLine);
+                if (outputLine.equals("Bye."))
+                    break;
+            }
         } catch (IOException e) {
             System.out.println("Exception caught when trying to listen on port "
                 + portNumber + " or listening for a connection");
