@@ -45,24 +45,37 @@ public class EchoServer {
         int portNumber = Integer.parseInt(args[0]);
         
 
-        try (
+        try {
+            
             ServerSocket serverSocket =
                 new ServerSocket(Integer.parseInt(args[0]));
-            Socket clientSocket = serverSocket.accept();     
+            System.out.println("init serversocket");
+            Socket clientSocket = serverSocket.accept();
+            System.out.println("client socket accepted");
             PrintWriter out = //out is the client side input stream. echo back to client using this stream
-                new PrintWriter(clientSocket.getOutputStream(), true);                   
+                new PrintWriter(clientSocket.getOutputStream(), true); 
+            System.out.println("get output stream done");
             BufferedReader in = new BufferedReader( // socket stream the client send message
                 new InputStreamReader(clientSocket.getInputStream()));
-        ) {
+            System.out.println("get input stream done");
+            
+            
+            
             String inputLine;
             inputLine = in.readLine();
-//            while ((inputLine = in.readLine()) != null) {
-//               // out.println(inputLine); //echo back
-//                System.out.println("received: "+inputLine);
-//            }
-            out.println("HTTP/1.1 307 Temporary Redirect");
-            out.println("Location: https://www.eff.org/");
-            out.println();
+            while ((inputLine = in.readLine()) != null) {
+               // out.println(inputLine); //echo back
+               // System.out.println("received: "+inputLine);
+            }
+            
+            in.close();
+            out.close();
+            clientSocket.close();
+            serverSocket.close();
+            
+//            out.println("HTTP/1.1 307 Temporary Redirect");
+//            out.println("Location: https://www.eff.org/");
+//            out.println();
         } catch (IOException e) {
             System.out.println("Exception caught when trying to listen on port "
                 + portNumber + " or listening for a connection");
